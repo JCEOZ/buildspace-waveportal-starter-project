@@ -9,6 +9,23 @@ export default function App() {
 
   }
 
+  const connectWallet = async () => {
+    try {
+      const { ethereum } = window;
+      if (!ethereum) {
+        alert("Get Metamask!");
+        return;
+      }
+
+      const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+      const account = accounts[0];
+      console.log("Connected: ", account);
+      setCurrentAccount(account);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const checkIfWalletIsConnected = async () => {
     // First make sure we have access to window.ethereum
     const { ethereum } = window;
@@ -51,6 +68,12 @@ export default function App() {
         <button className="waveButton" onClick={wave}>
           Wave at Me
         </button>
+
+        { !currentAccount && (
+          <button className="waveButton" onClick={connectWallet}>
+            Connect Wallet
+          </button>
+        )}
       </div>
     </div>
   );
