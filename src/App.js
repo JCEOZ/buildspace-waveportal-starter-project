@@ -5,8 +5,28 @@ import abi from "./utils/WavePortal.json";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = React.useState("");
+  const [totalNumberOfWaves, setTotalNumberOfWaves] = React.useState(0);
   const contractAddress = "0x2E40fc20092A1Ed2F28137b0B572a5eFbB8321d5";
   const contractABI = abi.abi;
+
+  const getTotalWaves = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const count = await wavePortalContract.getTotalWaves();
+        console.log("Retrieved total wave count: ", count.toNumber());
+        setTotalNumberOfWaves(count.toNumber());
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const wave = async () => {
     try {
@@ -16,17 +36,15 @@ export default function App() {
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-        let count = await wavePortalContract.getTotalWaves();
-        console.log("Retrieved total wave count: ", count.toNumber());
-
         const waveTxn = await wavePortalContract.wave();
         console.log("Mining: ", waveTxn.hash);
 
         await waveTxn.wait();
         console.log("Mined: ", waveTxn.hash)
 
-        count = await wavePortalContract.getTotalWaves();
+        const count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count: ", count.toNumber());
+        setTotalNumberOfWaves(count.toNumber());
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -77,6 +95,7 @@ export default function App() {
   // This runs our function when the page loads.
   React.useEffect(() => {
     checkIfWalletIsConnected();
+    getTotalWaves();
   }, [])
   
   return (
@@ -92,7 +111,7 @@ export default function App() {
         </div>
 
         <button className="waveButton" onClick={wave}>
-          Wave at Me
+          Wave at Me (Total number of counts: { totalNumberOfWaves })
         </button>
 
         { !currentAccount && (
