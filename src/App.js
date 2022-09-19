@@ -65,7 +65,9 @@ export default function App() {
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-        const waveTxn = await wavePortalContract.wave("This is a message");
+        
+        const message = document.getElementById("wave_message").value;
+        const waveTxn = await wavePortalContract.wave(message);
         console.log("Mining: ", waveTxn.hash);
 
         await waveTxn.wait();
@@ -139,6 +141,8 @@ export default function App() {
         <div className="bio">
         I am J'CEO'Z and I worked as a developer so that's pretty cool right? Connect your Ethereum wallet and wave at me!
         </div>
+
+        <input type="text" id="wave_message" required />
 
         <button className="waveButton" onClick={wave}>
           Wave at Me (Total number of counts: { totalNumberOfWaves })
