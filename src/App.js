@@ -67,7 +67,7 @@ export default function App() {
 
         
         const message = document.getElementById("wave_message").value;
-        const waveTxn = await wavePortalContract.wave(message);
+        const waveTxn = await wavePortalContract.wave(message, { gasLimit: 300000 });
         console.log("Mining: ", waveTxn.hash);
 
         await waveTxn.wait();
