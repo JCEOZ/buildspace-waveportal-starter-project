@@ -39,13 +39,12 @@ export default function App() {
 
         const waves = await wavePortalContract.getAllWaves();
 
-        let wavesCleaned = [];
-        waves.forEach(wave => {
-          wavesCleaned.push({
+        let wavesCleaned = waves.map(wave => {
+          return {
             address: wave.waver,
             timestamp: new Date(wave.timestamp * 1000),
             message: wave.message
-          });
+          };
         });
 
         setAllWaves(wavesCleaned);
@@ -128,7 +127,38 @@ export default function App() {
   // This runs our function when the page loads.
   React.useEffect(() => {
     checkIfWalletIsConnected();
-  }, [])
+  }, []);
+
+  // Listen in for emitter events!
+  React.useEffect(() => {
+    let wavePortalContract;
+
+    const onNewWave = (from, timestamp, message) => {
+      console.log("NewWave", from, timestamp, message);
+      setAllWaves(prevState => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          message: message
+        }
+      ]);
+    };
+
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      wavePortalContract = new ethers.Contract(contractAddress, contractABI, signer);
+      wavePortalContract.on("NewWave", onNewWave);
+    }
+
+    return () => {
+      if (wavePortalContract) {
+        wavePortalContract.off("NewWave", onNewWave);
+      }
+    }
+  }, []);
   
   return (
     <div className="mainContainer">
