@@ -7,7 +7,7 @@ export default function App() {
   const [currentAccount, setCurrentAccount] = React.useState("");
   const [totalNumberOfWaves, setTotalNumberOfWaves] = React.useState(0);
   const [allWaves, setAllWaves] = React.useState([]);
-  const contractAddress = "0x7570c7d4F2b6BD984b7fe47DCA1Fef6d48d661f1";
+  const contractAddress = "0xB9dde61c6adE82406e947877cb15cF7A36F013D7";
   const contractABI = abi.abi;
 
   const getTotalWaves = async () => {
